@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gregors Geburtstags-Schach</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Gregors Geburtstags-Schach</h1>
+            <div class="birthday-message">
+                <p>Alles Gute zum Geburtstag, Gregor!</p>
+                <p>Ein besonderes Geschenk von Nico</p>
+            </div>
+            <div class="heart-container">
+                <div class="big-heart">
+                    <div class="family-section">
+                        <div class="la-familia">LaFamilia</div>
+                        <div class="family-names">
+                            <span class="name">Biggi</span>
+                            <span class="name">Tim</span>
+                            <span class="name">Nico</span>
+                            <span class="name">Gregor</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="theme-switch">
+                <button id="themeToggle">☀️</button>
+            </div>
+        </header>
+
+        <div class="game-controls">
+            <div class="mode-buttons">
+                <button id="mode2player">2 Spieler</button>
+                <button id="modeAI">Gegen KI</button>
+                <button id="modeBlitz">Blitzschach</button>
+                <button id="modePractice">Übung</button>
+            </div>
+            <div class="timer-controls">
+                <div class="player-timer white-timer">
+                    <span class="player-name">Weiß</span>
+                    <span class="time" id="whiteTime">10:00</span>
+                    <button class="timer-button" id="whiteTimer">⏸</button>
+                </div>
+                <div class="player-timer black-timer">
+                    <span class="player-name">Schwarz</span>
+                    <span class="time" id="blackTime">10:00</span>
+                    <button class="timer-button" id="blackTimer">⏸</button>
+                </div>
+            </div>
+            <div class="game-buttons">
+                <button id="newGame">Neues Spiel</button>
+                <button id="saveGame">Speichern</button>
+                <button id="loadGame">Laden</button>
+            </div>
+        </div>
+
+        <div class="game-container">
+            <div class="game-info">
+                <div id="status">Weiß ist am Zug</div>
+                <div id="timer">Zeit: 10:00</div>
+                <div id="moves">Züge: 0</div>
+                <div id="captured">Geschlagene Figuren: 0</div>
+            </div>
+
+            <div id="board" class="chessboard"></div>
+
+            <div class="game-sidebar">
+                <div class="difficulty-selector">
+                    <h3>KI-Schwierigkeit</h3>
+                    <select id="aiDifficulty">
+                        <option value="easy">Leicht</option>
+                        <option value="medium">Mittel</option>
+                        <option value="hard">Schwer</option>
+                    </select>
+                </div>
+
+                <div class="achievements">
+                    <h3>Erfolge</h3>
+                    <div id="achievementsList"></div>
+                </div>
+
+                <div class="statistics">
+                    <h3>Statistiken</h3>
+                    <div id="statisticsList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tutorialOverlay" class="tutorial-overlay">
+        <div class="tutorial-content">
+            <h2>Willkommen zu deinem Geburtstags-Schach!</h2>
+            <p id="tutorialSteps"></p>
+            <button id="nextTutorial">Weiter</button>
+            <button id="closeTutorial">Überspringen</button>
+        </div>
+    </div>
+
+    <div id="achievementPopup" class="achievement-popup">
+        <div class="achievement-content">
+            <h3>Erfolg freigeschaltet!</h3>
+            <p id="achievementText"></p>
+        </div>
+    </div>
+
+    <!-- Sound-Effekte -->
+    <audio id="moveSound" src="sounds/move.mp3" preload="auto"></audio>
+    <audio id="captureSound" src="sounds/capture.mp3" preload="auto"></audio>
+    <audio id="checkSound" src="sounds/check.mp3" preload="auto"></audio>
+    <audio id="gameStartSound" src="sounds/game-start.mp3" preload="auto"></audio>
+    <audio id="gameEndSound" src="sounds/game-end.mp3" preload="auto"></audio>
+    <audio id="achievementSound" src="sounds/achievement.mp3" preload="auto"></audio>
+    <audio id="backgroundMusic" src="sounds/background.mp3" loop preload="auto"></audio>
+
+    <script src="script.js"></script>
+</body>
+</html> 
