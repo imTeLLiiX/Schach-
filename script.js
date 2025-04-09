@@ -1,416 +1,662 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // Konstanten für häufig verwendete Werte
-    const BOARD_SIZE = 8;
-    const PIECES = {
-        WHITE: {
-            KING: 'white-king',
-            QUEEN: 'white-queen',
-            BISHOP: 'white-bishop',
-            KNIGHT: 'white-knight',
-            ROOK: 'white-rook',
-            PAWN: 'white-pawn'
-        },
-        BLACK: {
-            KING: 'black-king',
-            QUEEN: 'black-queen',
-            BISHOP: 'black-bishop',
-            KNIGHT: 'black-knight',
-            ROOK: 'black-rook',
-            PAWN: 'black-pawn'
-        }
-    };
-    
-    // Spielvariablen
-    let board = [];
-    let selectedPiece = null;
-    let currentPlayer = 'white';
-    let gameMode = 'classic'; // 'classic' oder 'gregors-fluch'
-    let beerCount = 0;
-    let kurwaKingActive = false;
-    let isKurwaKingMode = false;
-    let isGregorFluchMode = false;
-    
-    // DOM-Elemente
-    const chessboard = document.getElementById('chessboard');
-    const newGameBtn = document.getElementById('new-game');
-    const toggleModeBtn = document.getElementById('toggle-mode');
-    const currentPlayerSpan = document.getElementById('current-player');
-    const gameModeSpan = document.getElementById('game-mode');
-    const beerCountSpan = document.getElementById('beer-count');
-    const kurwaKingStatus = document.getElementById('kurwa-king-status');
-    const gameStatus = document.getElementById('gameStatus');
-    const modeSelector = document.getElementById('modeSelector');
-    
-    // Audio-Daten als Base64
-    const AUDIO_DATA = {
-        move: 'data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjI5LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAAFbgCenp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6e//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjU0AAAAAAAAAAAAAAAAJAAAAAAAAAAAAQVuhy3WBAAAAAAAA//7UEQAAAeNjFAABpAAAAL4YkUAEHQAnxghQAQdACfGCFABB0AJ8YIUAEHQAnxghQAQdACf/////////////////////+VSuQEWALgEQD/////////////////////9bkCsBEIBcA',
-        capture: 'data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjI5LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAAFbgCenp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6e//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjU0AAAAAAAAAAAAAAAAJAAAAAAAAAAAAQVujkXoBAAAAAAAAA//7UEQAAAeNjFAABpAAAAL4YkUAEHQAnxghQAQdACfGCFABB0AJ8YIUAEHQAnxghQAQdACf/////////////////////+VSuQEWALgEQD/////////////////////9bkCsBEIBcA',
-        check: 'data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjI5LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAAFbgCenp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6e//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjU0AAAAAAAAAAAAAAAAJAAAAAAAAAAAAQVujWXmBAAAAAAAAA//7UEQAAAeNjFAABpAAAAL4YkUAEHQAnxghQAQdACfGCFABB0AJ8YIUAEHQAnxghQAQdACf/////////////////////+VSuQEWALgEQD/////////////////////9bkCsBEIBcA',
-        kurwaKing: 'data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjI5LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAAFbgCenp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6e//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjU0AAAAAAAAAAAAAAAAJAAAAAAAAAAAAQVujXXmBAAAAAAAAA//7UEQAAAeNjFAABpAAAAL4YkUAEHQAnxghQAQdACfGCFABB0AJ8YIUAEHQAnxghQAQdACf/////////////////////+VSuQEWALgEQD/////////////////////9bkCsBEIBcA',
-        gregorFluch: 'data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjI5LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAAFbgCenp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6e//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjU0AAAAAAAAAAAAAAAAJAAAAAAAAAAAAQVujYXmBAAAAAAAAA//7UEQAAAeNjFAABpAAAAL4YkUAEHQAnxghQAQdACfGCFABB0AJ8YIUAEHQAnxghQAQdACf/////////////////////+VSuQEWALgEQD/////////////////////9bkCsBEIBcA',
-        gameStart: 'data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjI5LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAAFbgCenp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6e//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjU0AAAAAAAAAAAAAAAAJAAAAAAAAAAAAQVujZXmBAAAAAAAAA//7UEQAAAeNjFAABpAAAAL4YkUAEHQAnxghQAQdACfGCFABB0AJ8YIUAEHQAnxghQAQdACf/////////////////////+VSuQEWALgEQD/////////////////////9bkCsBEIBcA',
-        gameEnd: 'data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjI5LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAAFbgCenp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6enp6e//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjU0AAAAAAAAAAAAAAAAJAAAAAAAAAAAAQVujaXmBAAAAAAAAA//7UEQAAAeNjFAABpAAAAL4YkUAEHQAnxghQAQdACfGCFABB0AJ8YIUAEHQAnxghQAQdACf/////////////////////+VSuQEWALgEQD/////////////////////9bkCsBEIBcA'
-    };
-    
-    // Sound-Effekte
-    const sounds = {};
-    Object.keys(AUDIO_DATA).forEach(key => {
-        sounds[key] = new Audio(AUDIO_DATA[key]);
-    });
-    
-    // Initialisiere das Schachbrett
-    function initializeBoard() {
-        board = [];
-        chessboard.innerHTML = '';
-        
-        // Erstelle das 8x8 Schachbrett
-        for (let row = 0; row < 8; row++) {
-            board[row] = [];
-            for (let col = 0; col < 8; col++) {
-                const square = document.createElement('div');
-                square.className = `square ${(row + col) % 2 === 0 ? 'white' : 'black'}`;
-                square.dataset.row = row;
-                square.dataset.col = col;
-                square.addEventListener('click', handleSquareClick);
-                chessboard.appendChild(square);
-                board[row][col] = null;
-            }
-        }
-        
-        // Platziere die Figuren
-        placePieces();
+// Spielzustand
+let gameState = {
+    board: [],
+    currentPlayer: 'white',
+    selectedPiece: null,
+    isAIMode: false,
+    isAITurn: false,
+    isBlitzMode: false,
+    isPracticeMode: false,
+    moveCount: 0,
+    capturedPieces: 0,
+    timeLeft: 600, // 10 Minuten in Sekunden
+    timer: null,
+    achievements: new Set(),
+    statistics: {
+        gamesPlayed: 0,
+        gamesWon: 0,
+        gamesLost: 0,
+        totalMoves: 0,
+        totalCaptures: 0
     }
-    
-    // Platziere die Schachfiguren auf dem Brett
-    function placePieces() {
-        // Schwarze Figuren
-        placePiece(0, 0, 'black-rook');
-        placePiece(0, 1, 'black-knight');
-        placePiece(0, 2, 'black-bishop');
-        placePiece(0, 3, 'black-queen');
-        placePiece(0, 4, 'black-king');
-        placePiece(0, 5, 'black-bishop');
-        placePiece(0, 6, 'black-knight');
-        placePiece(0, 7, 'black-rook');
-        
-        // Schwarze Bauern
-        for (let col = 0; col < 8; col++) {
-            placePiece(1, col, 'black-pawn');
-        }
-        
-        // Weiße Figuren
-        placePiece(7, 0, 'white-rook');
-        placePiece(7, 1, 'white-knight');
-        placePiece(7, 2, 'white-bishop');
-        placePiece(7, 3, 'white-queen');
-        placePiece(7, 4, 'white-king');
-        placePiece(7, 5, 'white-bishop');
-        placePiece(7, 6, 'white-knight');
-        placePiece(7, 7, 'white-rook');
-        
-        // Weiße Bauern
-        for (let col = 0; col < 8; col++) {
-            placePiece(6, col, 'white-pawn');
-        }
-    }
-    
-    // Platziere eine Figur auf dem Brett
-    function placePiece(row, col, piece) {
-        const square = document.querySelector(`.square[data-row="${row}"][data-col="${col}"]`);
-        square.dataset.piece = piece;
-        board[row][col] = piece;
-    }
-    
-    // Event Listener mit Throttling
-    function throttle(func, limit) {
-        let inThrottle;
-        return function(...args) {
-            if (!inThrottle) {
-                func.apply(this, args);
-                inThrottle = true;
-                setTimeout(() => inThrottle = false, limit);
-            }
-        }
-    }
-    
-    // Optimierte Click-Handler
-    const handleSquareClick = throttle((event) => {
-        const square = event.target.closest('.square');
-        if (!square) return;
-        
-        const row = parseInt(square.dataset.row);
-        const col = parseInt(square.dataset.col);
-        
-        if (selectedPiece) {
-            if (isValidMove(selectedPiece, row, col)) {
-                movePiece(selectedPiece, row, col);
-                deselectPiece();
-            } else {
-                deselectPiece();
-            }
-        } else if (board[row][col] && board[row][col].color === currentPlayer) {
-            selectPiece(row, col);
-        }
-    }, 100);
-    
-    // Wähle eine Figur aus
-    function selectPiece(row, col) {
-        selectedPiece = board[row][col];
-        const square = document.querySelector(`.square[data-row="${row}"][data-col="${col}"]`);
-        square.classList.add('selected');
-    }
-    
-    // Deselektiere die ausgewählte Figur
-    function deselectPiece() {
-        if (selectedPiece) {
-            selectedPiece.classList.remove('selected');
-            selectedPiece = null;
-        }
-    }
-    
-    // Bewege eine Figur
-    function movePiece(piece, targetRow, targetCol) {
-        const targetPiece = board[targetRow][targetCol];
-        if (targetPiece) {
-            capturePiece(targetRow, targetCol);
-        }
-        
-        board[targetRow][targetCol] = piece;
-        board[piece.row][piece.col] = null;
-        piece.row = targetRow;
-        piece.col = targetCol;
-        
-        updateBoard();
-        checkForSpecialEvents();
-        switchPlayer();
-    }
-    
-    // Prüfe, ob ein Zug gültig ist
-    function isValidMove(piece, targetRow, targetCol) {
-        if (targetRow < 0 || targetRow >= BOARD_SIZE || targetCol < 0 || targetCol >= BOARD_SIZE) {
-            return false;
-        }
+};
 
-        const targetPiece = board[targetRow][targetCol];
-        if (targetPiece && targetPiece.color === piece.color) {
-            return false;
+// DOM-Elemente
+const board = document.getElementById('board');
+const status = document.getElementById('status');
+const timer = document.getElementById('timer');
+const moves = document.getElementById('moves');
+const captured = document.getElementById('captured');
+const themeToggle = document.getElementById('themeToggle');
+const aiDifficulty = document.getElementById('aiDifficulty');
+
+// Sound-Effekte
+const sounds = {
+    move: document.getElementById('moveSound'),
+    capture: document.getElementById('captureSound'),
+    check: document.getElementById('checkSound'),
+    gameStart: document.getElementById('gameStartSound'),
+    gameEnd: document.getElementById('gameEndSound'),
+    achievement: document.getElementById('achievementSound'),
+    background: document.getElementById('backgroundMusic')
+};
+
+// Schach-Timer Funktionalität
+class ChessTimer {
+    constructor() {
+        this.whiteTime = 600; // 10 Minuten in Sekunden
+        this.blackTime = 600;
+        this.activeTimer = null;
+        this.interval = null;
+        this.isRunning = false;
+
+        // DOM Elemente
+        this.whiteDisplay = document.getElementById('whiteTime');
+        this.blackDisplay = document.getElementById('blackTime');
+        this.whiteTimer = document.getElementById('whiteTimer');
+        this.blackTimer = document.getElementById('blackTimer');
+        this.whiteTimerContainer = document.querySelector('.white-timer');
+        this.blackTimerContainer = document.querySelector('.black-timer');
+
+        // Event Listener
+        this.whiteTimer.addEventListener('click', () => this.toggleTimer('white'));
+        this.blackTimer.addEventListener('click', () => this.toggleTimer('black'));
+
+        // Initialisierung
+        this.updateDisplay();
+    }
+
+    formatTime(seconds) {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+        return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+    }
+
+    updateDisplay() {
+        this.whiteDisplay.textContent = this.formatTime(this.whiteTime);
+        this.blackDisplay.textContent = this.formatTime(this.blackTime);
+
+        // Warnung bei wenig Zeit (unter 30 Sekunden)
+        this.whiteTimerContainer.classList.toggle('time-low', this.whiteTime < 30);
+        this.blackTimerContainer.classList.toggle('time-low', this.blackTime < 30);
+    }
+
+    toggleTimer(color) {
+        if (!this.isRunning) {
+            this.startTimer(color);
+        } else if (this.activeTimer === color) {
+            this.pauseTimer();
+        } else {
+            this.switchTimer(color);
         }
+    }
 
-        const rowDiff = Math.abs(targetRow - piece.row);
-        const colDiff = Math.abs(targetCol - piece.col);
-
-        switch (piece.type) {
-            case PIECES.WHITE.KING:
-            case PIECES.BLACK.KING:
-                return rowDiff <= 1 && colDiff <= 1;
-                
-            case PIECES.WHITE.QUEEN:
-            case PIECES.BLACK.QUEEN:
-                return (rowDiff === colDiff || rowDiff === 0 || colDiff === 0) && 
-                       !isPieceBetween(piece.row, piece.col, targetRow, targetCol);
-                
-            case PIECES.WHITE.BISHOP:
-            case PIECES.BLACK.BISHOP:
-                return rowDiff === colDiff && !isPieceBetween(piece.row, piece.col, targetRow, targetCol);
-                
-            case PIECES.WHITE.KNIGHT:
-            case PIECES.BLACK.KNIGHT:
-                return (rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2);
-                
-            case PIECES.WHITE.ROOK:
-            case PIECES.BLACK.ROOK:
-                return (rowDiff === 0 || colDiff === 0) && 
-                       !isPieceBetween(piece.row, piece.col, targetRow, targetCol);
-                
-            case PIECES.WHITE.PAWN:
-            case PIECES.BLACK.PAWN:
-                const direction = piece.color === 'white' ? -1 : 1;
-                const startRow = piece.color === 'white' ? 6 : 1;
-                
-                if (colDiff === 0) {
-                    if (targetRow === piece.row + direction && !targetPiece) {
-                        return true;
-                    }
-                    if (piece.row === startRow && targetRow === piece.row + 2 * direction && 
-                        !targetPiece && !board[piece.row + direction][piece.col]) {
-                        return true;
-                    }
-                } else if (colDiff === 1 && targetRow === piece.row + direction) {
-                    return targetPiece !== null;
+    startTimer(color) {
+        this.isRunning = true;
+        this.activeTimer = color;
+        this.updateActiveState();
+        
+        this.interval = setInterval(() => {
+            if (this.activeTimer === 'white') {
+                this.whiteTime--;
+                if (this.whiteTime <= 0) {
+                    this.timeUp('white');
                 }
-                return false;
-        }
-        return false;
+            } else {
+                this.blackTime--;
+                if (this.blackTime <= 0) {
+                    this.timeUp('black');
+                }
+            }
+            this.updateDisplay();
+        }, 1000);
+
+        // Button-Text aktualisieren
+        this.whiteTimer.textContent = color === 'white' ? '⏸' : '▶';
+        this.blackTimer.textContent = color === 'black' ? '⏸' : '▶';
     }
-    
-    // Prüfe, ob sich eine Figur zwischen Start- und Zielfeld befindet
-    function isPieceBetween(fromRow, fromCol, toRow, toCol) {
-        const rowDir = fromRow === toRow ? 0 : (toRow - fromRow) / Math.abs(toRow - fromRow);
-        const colDir = fromCol === toCol ? 0 : (toCol - fromCol) / Math.abs(toCol - fromCol);
+
+    pauseTimer() {
+        this.isRunning = false;
+        clearInterval(this.interval);
+        this.interval = null;
+        this.activeTimer = null;
+        this.updateActiveState();
         
-        let currentRow = fromRow + rowDir;
-        let currentCol = fromCol + colDir;
-        
-        while (currentRow !== toRow || currentCol !== toCol) {
-            if (board[currentRow][currentCol]) {
-                return true;
-            }
-            currentRow += rowDir;
-            currentCol += colDir;
+        // Button-Text zurücksetzen
+        this.whiteTimer.textContent = '▶';
+        this.blackTimer.textContent = '▶';
+    }
+
+    switchTimer(color) {
+        clearInterval(this.interval);
+        this.startTimer(color);
+    }
+
+    timeUp(color) {
+        this.pauseTimer();
+        alert(`Zeit abgelaufen! ${color === 'white' ? 'Schwarz' : 'Weiß'} gewinnt!`);
+    }
+
+    updateActiveState() {
+        this.whiteTimerContainer.classList.toggle('active', this.activeTimer === 'white');
+        this.blackTimerContainer.classList.toggle('active', this.activeTimer === 'black');
+    }
+
+    reset() {
+        this.pauseTimer();
+        this.whiteTime = 600;
+        this.blackTime = 600;
+        this.updateDisplay();
+    }
+}
+
+// Timer initialisieren
+const chessTimer = new ChessTimer();
+
+// Timer bei neuem Spiel zurücksetzen
+document.getElementById('newGame').addEventListener('click', () => {
+    chessTimer.reset();
+});
+
+// Initialisierung
+function initializeGame() {
+    createBoard();
+    setupEventListeners();
+    loadGameState();
+    startTutorial();
+    playSound('gameStart');
+}
+
+// Schachbrett erstellen
+function createBoard() {
+    const initialSetup = [
+        ['♜', '♞', '♝', '♛', '♚', '♝', '♞', '♜'],
+        ['♟', '♟', '♟', '♟', '♟', '♟', '♟', '♟'],
+        ['', '', '', '', '', '', '', ''],
+        ['', '', '', '', '', '', '', ''],
+        ['', '', '', '', '', '', '', ''],
+        ['', '', '', '', '', '', '', ''],
+        ['♙', '♙', '♙', '♙', '♙', '♙', '♙', '♙'],
+        ['♖', '♘', '♗', '♕', '♔', '♗', '♘', '♖']
+    ];
+
+    board.innerHTML = '';
+    gameState.board = [];
+
+    for (let row = 0; row < 8; row++) {
+        gameState.board[row] = [];
+        for (let col = 0; col < 8; col++) {
+            const square = document.createElement('div');
+            square.className = `square ${(row + col) % 2 === 0 ? 'white' : 'black'}`;
+            square.dataset.row = row;
+            square.dataset.col = col;
+            square.textContent = initialSetup[row][col];
+            square.addEventListener('click', handleSquareClick);
+            board.appendChild(square);
+            gameState.board[row][col] = initialSetup[row][col];
         }
-        
-        return false;
     }
-    
-    // Optimierte Spiellogik
-    function checkForSpecialEvents() {
-        if (isKurwaKingMode) {
-            checkForKurwaKing();
-        }
-        if (isGregorFluchMode) {
-            checkForGregorFluch();
-        }
-        checkForCheck();
+}
+
+// Event Listener Setup
+function setupEventListeners() {
+    // Spielmodus-Buttons
+    document.getElementById('mode2player').addEventListener('click', () => setGameMode('2player'));
+    document.getElementById('modeAI').addEventListener('click', () => setGameMode('ai'));
+    document.getElementById('modeBlitz').addEventListener('click', () => setGameMode('blitz'));
+    document.getElementById('modePractice').addEventListener('click', () => setGameMode('practice'));
+
+    // Spiel-Buttons
+    document.getElementById('newGame').addEventListener('click', startNewGame);
+    document.getElementById('saveGame').addEventListener('click', saveGameState);
+    document.getElementById('loadGame').addEventListener('click', loadGameState);
+
+    // Theme Toggle
+    themeToggle.addEventListener('click', toggleTheme);
+
+    // Tutorial
+    document.getElementById('nextTutorial').addEventListener('click', nextTutorialStep);
+    document.getElementById('closeTutorial').addEventListener('click', closeTutorial);
+}
+
+// Spielmodus setzen
+function setGameMode(mode) {
+    gameState.isAIMode = mode === 'ai';
+    gameState.isBlitzMode = mode === 'blitz';
+    gameState.isPracticeMode = mode === 'practice';
+
+    // UI aktualisieren
+    document.querySelectorAll('.mode-buttons button').forEach(btn => btn.classList.remove('active'));
+    document.getElementById(`mode${mode.charAt(0).toUpperCase() + mode.slice(1)}`).classList.add('active');
+
+    if (gameState.isBlitzMode) {
+        startTimer();
+    } else {
+        stopTimer();
     }
 
-    function checkForKurwaKing() {
-        const kings = findPieces(PIECES.WHITE.KING).concat(findPieces(PIECES.BLACK.KING));
-        kings.forEach(king => {
-            if (isSurroundedByPawns(king)) {
-                showKurwaKingAnimation(king);
-            }
-        });
-    }
-
-    function checkForGregorFluch() {
-        const pieces = getAllPieces();
-        pieces.forEach(piece => {
-            if (Math.random() < 0.1) {
-                showGregorFluchAnimation(piece);
-            }
-        });
-    }
-
-    function checkForCheck() {
-        const king = findKing(currentPlayer);
-        if (isKingInCheck(king)) {
-            showCheckAnimation(king);
-            sounds.check.play();
-        }
-    }
-
-    // Optimierte Hilfsfunktionen
-    function findPieces(type) {
-        return board.flat().filter(piece => piece && piece.type === type);
-    }
-
-    function findKing(color) {
-        return board.flat().find(piece => 
-            piece && piece.type === (color === 'white' ? PIECES.WHITE.KING : PIECES.BLACK.KING)
-        );
-    }
-
-    function isSurroundedByPawns(king) {
-        const directions = [[-1,-1], [-1,0], [-1,1], [0,-1], [0,1], [1,-1], [1,0], [1,1]];
-        return directions.every(([row, col]) => {
-            const targetRow = king.row + row;
-            const targetCol = king.col + col;
-            if (targetRow < 0 || targetRow >= BOARD_SIZE || targetCol < 0 || targetCol >= BOARD_SIZE) {
-                return false;
-            }
-            const piece = board[targetRow][targetCol];
-            return piece && piece.type.includes('pawn');
-        });
-    }
-
-    function isKingInCheck(king) {
-        const opponentPieces = getAllPieces().filter(piece => piece.color !== king.color);
-        return opponentPieces.some(piece => isValidMove(piece, king.row, king.col));
-    }
-
-    // Optimierte Animationen
-    function showKurwaKingAnimation(king) {
-        const square = document.querySelector(`[data-row="${king.row}"][data-col="${king.col}"]`);
-        square.classList.add('kurwa-king');
-        sounds.kurwaKing.play();
-        setTimeout(() => square.classList.remove('kurwa-king'), 1000);
-    }
-
-    function showGregorFluchAnimation(piece) {
-        const square = document.querySelector(`[data-row="${piece.row}"][data-col="${piece.col}"]`);
-        square.classList.add('gregor-fluch');
-        sounds.gregorFluch.play();
-        setTimeout(() => square.classList.remove('gregor-fluch'), 1000);
-    }
-
-    function showCheckAnimation(king) {
-        const square = document.querySelector(`[data-row="${king.row}"][data-col="${king.col}"]`);
-        square.classList.add('check');
-        setTimeout(() => square.classList.remove('check'), 1000);
-    }
-
-    // Optimierte Spielfortschritt
-    function switchPlayer() {
-        currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
-        updateGameStatus();
-    }
-
-    function updateGameStatus() {
-        gameStatus.textContent = `Aktueller Spieler: ${currentPlayer === 'white' ? 'Weiß' : 'Schwarz'}`;
-    }
-
-    // Starte ein neues Spiel
-    function startNewGame() {
-        sounds.gameStart.play();
-        currentPlayer = 'white';
-        beerCount = 0;
-        kurwaKingActive = false;
-        document.body.classList.remove('kurwa-mode');
-        initializeBoard();
-        updateGameStatus();
-    }
-    
-    // Wechsle den Spielmodus
-    function toggleGameMode() {
-        gameMode = gameMode === 'classic' ? 'gregors-fluch' : 'classic';
-        gameModeSpan.textContent = gameMode === 'classic' ? 'Klassisch' : 'Gregor\'s Fluch';
-    }
-    
-    // Event-Listener
-    newGameBtn.addEventListener('click', startNewGame);
-    toggleModeBtn.addEventListener('click', toggleGameMode);
-    modeSelector.addEventListener('change', (e) => {
-        gameMode = e.target.value;
-        isKurwaKingMode = gameMode === 'kurwa-king';
-        isGregorFluchMode = gameMode === 'gregor-fluch';
-        startNewGame();
-    });
-    
-    // Menü-Button Event Listener
-    document.querySelectorAll('.menu-button').forEach(button => {
-        button.addEventListener('click', (event) => {
-            const action = event.target.textContent.trim();
-            switch(action) {
-                case 'Neues Spiel':
-                    initializeBoard();
-                    break;
-                case 'Laden':
-                    // Implementiere Laden-Funktion
-                    break;
-                case 'Speichern':
-                    // Implementiere Speichern-Funktion
-                    break;
-                case 'Einstellungen':
-                    // Implementiere Einstellungen-Funktion
-                    break;
-                case '🍺 Bierklingel':
-                    // Implementiere Bierklingel-Funktion
-                    alert('Prost! 🍺');
-                    break;
-            }
-        });
-    });
-    
-    // Spiel starten
     startNewGame();
-}); 
+}
+
+// Neues Spiel starten
+function startNewGame() {
+    gameState.currentPlayer = 'white';
+    gameState.moveCount = 0;
+    gameState.capturedPieces = 0;
+    gameState.selectedPiece = null;
+    gameState.isAITurn = false;
+    
+    createBoard();
+    updateUI();
+    playSound('gameStart');
+}
+
+// Spielzug verarbeiten
+function handleSquareClick(event) {
+    if (gameState.isAITurn) return;
+
+    const row = parseInt(event.target.dataset.row);
+    const col = parseInt(event.target.dataset.col);
+    const piece = gameState.board[row][col];
+
+    if (gameState.selectedPiece) {
+        const selectedRow = parseInt(gameState.selectedPiece.dataset.row);
+        const selectedCol = parseInt(gameState.selectedPiece.dataset.col);
+
+        if (isValidMove(selectedRow, selectedCol, row, col)) {
+            makeMove(selectedRow, selectedCol, row, col);
+            
+            if (gameState.isAIMode) {
+                gameState.isAITurn = true;
+                setTimeout(makeAIMove, 500);
+            }
+        }
+
+        gameState.selectedPiece.classList.remove('selected');
+        gameState.selectedPiece = null;
+        clearHighlights();
+    }
+    else if (piece && isPieceOfCurrentPlayer(piece)) {
+        gameState.selectedPiece = event.target;
+        gameState.selectedPiece.classList.add('selected');
+        highlightPossibleMoves(row, col, piece);
+    }
+}
+
+// Zug ausführen
+function makeMove(fromRow, fromCol, toRow, toCol) {
+    const capturedPiece = gameState.board[toRow][toCol];
+    gameState.board[toRow][toCol] = gameState.board[fromRow][fromCol];
+    gameState.board[fromRow][fromCol] = '';
+    
+    const fromSquare = document.querySelector(`[data-row="${fromRow}"][data-col="${fromCol}"]`);
+    const toSquare = document.querySelector(`[data-row="${toRow}"][data-col="${toCol}"]`);
+    
+    toSquare.textContent = fromSquare.textContent;
+    fromSquare.textContent = '';
+    
+    gameState.moveCount++;
+    if (capturedPiece) {
+        gameState.capturedPieces++;
+        playSound('capture');
+    } else {
+        playSound('move');
+    }
+
+    if (isCheck()) {
+        playSound('check');
+    }
+
+    gameState.currentPlayer = gameState.currentPlayer === 'white' ? 'black' : 'white';
+    updateUI();
+    checkAchievements();
+}
+
+// KI-Zug
+function makeAIMove() {
+    const difficulty = aiDifficulty.value;
+    const move = findBestMove(difficulty);
+    
+    if (move) {
+        makeMove(move.fromRow, move.fromCol, move.toRow, move.toCol);
+    }
+    
+    gameState.isAITurn = false;
+}
+
+// Besten Zug finden
+function findBestMove(difficulty) {
+    const possibleMoves = [];
+    
+    for (let fromRow = 0; fromRow < 8; fromRow++) {
+        for (let fromCol = 0; fromCol < 8; fromCol++) {
+            const piece = gameState.board[fromRow][fromCol];
+            if (piece && isPieceOfCurrentPlayer(piece)) {
+                for (let toRow = 0; toRow < 8; toRow++) {
+                    for (let toCol = 0; toCol < 8; toCol++) {
+                        if (isValidMove(fromRow, fromCol, toRow, toCol)) {
+                            const move = {
+                                fromRow,
+                                fromCol,
+                                toRow,
+                                toCol,
+                                piece,
+                                score: evaluateMove(fromRow, fromCol, toRow, toCol, difficulty)
+                            };
+                            possibleMoves.push(move);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    if (possibleMoves.length === 0) return null;
+
+    // Sortiere Züge nach Bewertung
+    possibleMoves.sort((a, b) => b.score - a.score);
+
+    // Wähle einen Zug basierend auf der Schwierigkeit
+    const index = Math.floor(Math.random() * Math.min(3, possibleMoves.length));
+    return possibleMoves[index];
+}
+
+// Zug bewerten
+function evaluateMove(fromRow, fromCol, toRow, toCol, difficulty) {
+    let score = 0;
+    const piece = gameState.board[fromRow][fromCol];
+    const targetPiece = gameState.board[toRow][toCol];
+
+    // Basis-Punktwerte für Figuren
+    const pieceValues = {
+        '♟': 1, '♙': 1,
+        '♞': 3, '♘': 3,
+        '♝': 3, '♗': 3,
+        '♜': 5, '♖': 5,
+        '♛': 9, '♕': 9,
+        '♚': 0, '♔': 0
+    };
+
+    // Punkte für Schlagen
+    if (targetPiece) {
+        score += pieceValues[targetPiece] * 10;
+    }
+
+    // Zusätzliche Strategien basierend auf Schwierigkeit
+    if (difficulty === 'hard') {
+        // Zentrumskontrolle
+        if (toRow >= 3 && toRow <= 4 && toCol >= 3 && toCol <= 4) {
+            score += 2;
+        }
+        
+        // Königssicherheit
+        if (piece === '♚' || piece === '♔') {
+            score -= 5;
+        }
+    }
+
+    return score;
+}
+
+// Spielstand speichern
+function saveGameState() {
+    const gameData = {
+        board: gameState.board,
+        currentPlayer: gameState.currentPlayer,
+        moveCount: gameState.moveCount,
+        capturedPieces: gameState.capturedPieces,
+        timeLeft: gameState.timeLeft,
+        statistics: gameState.statistics,
+        achievements: Array.from(gameState.achievements)
+    };
+
+    localStorage.setItem('chessGameState', JSON.stringify(gameData));
+    showNotification('Spielstand gespeichert');
+}
+
+// Spielstand laden
+function loadGameState() {
+    const savedState = localStorage.getItem('chessGameState');
+    if (savedState) {
+        const gameData = JSON.parse(savedState);
+        gameState.board = gameData.board;
+        gameState.currentPlayer = gameData.currentPlayer;
+        gameState.moveCount = gameData.moveCount;
+        gameState.capturedPieces = gameData.capturedPieces;
+        gameState.timeLeft = gameData.timeLeft;
+        gameState.statistics = gameData.statistics;
+        gameState.achievements = new Set(gameData.achievements);
+
+        updateBoard();
+        updateUI();
+        showNotification('Spielstand geladen');
+    }
+}
+
+// UI aktualisieren
+function updateUI() {
+    status.textContent = `${gameState.currentPlayer === 'white' ? 'Weiß' : 'Schwarz'} ist am Zug`;
+    moves.textContent = `Züge: ${gameState.moveCount}`;
+    captured.textContent = `Geschlagene Figuren: ${gameState.capturedPieces}`;
+    updateTimer();
+    updateStatistics();
+    updateAchievements();
+}
+
+// Timer
+function startTimer() {
+    if (gameState.timer) clearInterval(gameState.timer);
+    gameState.timer = setInterval(() => {
+        gameState.timeLeft--;
+        updateTimer();
+        if (gameState.timeLeft <= 0) {
+            endGame('timeout');
+        }
+    }, 1000);
+}
+
+function stopTimer() {
+    if (gameState.timer) {
+        clearInterval(gameState.timer);
+        gameState.timer = null;
+    }
+}
+
+function updateTimer() {
+    const minutes = Math.floor(gameState.timeLeft / 60);
+    const seconds = gameState.timeLeft % 60;
+    timer.textContent = `Zeit: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+}
+
+// Theme
+function toggleTheme() {
+    const isDark = document.body.getAttribute('data-theme') === 'dark';
+    document.body.setAttribute('data-theme', isDark ? 'light' : 'dark');
+    themeToggle.textContent = isDark ? '🌙' : '☀️';
+}
+
+// Sound
+function playSound(soundName) {
+    const sound = sounds[soundName];
+    if (sound) {
+        sound.currentTime = 0;
+        sound.play().catch(() => {});
+    }
+}
+
+// Achievements
+function checkAchievements() {
+    const newAchievements = [];
+
+    if (gameState.moveCount === 1) {
+        newAchievements.push('Erster Zug');
+    }
+    if (gameState.capturedPieces === 1) {
+        newAchievements.push('Erste Figur geschlagen');
+    }
+    if (gameState.moveCount >= 50) {
+        newAchievements.push('Langes Spiel');
+    }
+
+    newAchievements.forEach(achievement => {
+        if (!gameState.achievements.has(achievement)) {
+            gameState.achievements.add(achievement);
+            showAchievement(achievement);
+        }
+    });
+}
+
+function showAchievement(achievement) {
+    const popup = document.getElementById('achievementPopup');
+    const text = document.getElementById('achievementText');
+    text.textContent = achievement;
+    popup.style.display = 'flex';
+    playSound('achievement');
+    setTimeout(() => {
+        popup.style.display = 'none';
+    }, 3000);
+}
+
+// Tutorial
+function startTutorial() {
+    const tutorial = document.getElementById('tutorialOverlay');
+    tutorial.style.display = 'flex';
+    showTutorialStep(0);
+}
+
+function showTutorialStep(step) {
+    const steps = [
+        'Willkommen beim Schach! Klicke auf "Weiter" um zu beginnen.',
+        'Wähle einen Spielmodus: 2 Spieler oder gegen die KI.',
+        'Klicke auf eine Figur um sie auszuwählen.',
+        'Klicke auf ein grünes Feld um die Figur zu bewegen.',
+        'Viel Spaß beim Spielen!'
+    ];
+
+    document.getElementById('tutorialSteps').textContent = steps[step];
+}
+
+function nextTutorialStep() {
+    const currentStep = parseInt(document.getElementById('tutorialSteps').dataset.step || 0);
+    if (currentStep < 4) {
+        showTutorialStep(currentStep + 1);
+    } else {
+        closeTutorial();
+    }
+}
+
+function closeTutorial() {
+    document.getElementById('tutorialOverlay').style.display = 'none';
+}
+
+// Hilfsfunktionen
+function isPieceOfCurrentPlayer(piece) {
+    const whitePieces = ['♔', '♕', '♖', '♗', '♘', '♙'];
+    const blackPieces = ['♚', '♛', '♜', '♝', '♞', '♟'];
+    return gameState.currentPlayer === 'white' ? whitePieces.includes(piece) : blackPieces.includes(piece);
+}
+
+function isValidMove(fromRow, fromCol, toRow, toCol) {
+    const piece = gameState.board[fromRow][fromCol];
+    const targetPiece = gameState.board[toRow][toCol];
+
+    if (targetPiece && isPieceOfCurrentPlayer(targetPiece)) {
+        return false;
+    }
+
+    // Hier können weitere Schachregeln implementiert werden
+    return true;
+}
+
+function highlightPossibleMoves(row, col, piece) {
+    for (let r = 0; r < 8; r++) {
+        for (let c = 0; c < 8; c++) {
+            const targetPiece = gameState.board[r][c];
+            if (!targetPiece || !isPieceOfCurrentPlayer(targetPiece)) {
+                const square = document.querySelector(`[data-row="${r}"][data-col="${c}"]`);
+                square.classList.add('possible-move');
+            }
+        }
+    }
+}
+
+function clearHighlights() {
+    const squares = document.querySelectorAll('.square');
+    squares.forEach(square => {
+        square.classList.remove('possible-move');
+    });
+}
+
+function showNotification(message) {
+    const notification = document.createElement('div');
+    notification.className = 'notification';
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
+
+// Familiennamen Interaktivität
+document.addEventListener('DOMContentLoaded', function() {
+    const names = document.querySelectorAll('.name');
+    
+    names.forEach(name => {
+        name.addEventListener('click', function() {
+            // Speichere den ursprünglichen Text
+            const originalText = this.textContent;
+            
+            // Ändere den Text zu einer Nachricht
+            this.textContent = '❤️';
+            
+            // Erstelle einen Partikeleffekt
+            createHeartParticles(this);
+            
+            // Stelle den ursprünglichen Text nach 1000ms wieder her
+            setTimeout(() => {
+                this.textContent = originalText;
+            }, 1000);
+        });
+    });
+    
+    // Funktion für Herz-Partikeleffekte
+    function createHeartParticles(element) {
+        const rect = element.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        
+        for (let i = 0; i < 8; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'heart-particle';
+            particle.innerHTML = '❤️';
+            document.body.appendChild(particle);
+            
+            // Zufällige Position und Bewegung
+            const angle = Math.random() * Math.PI * 2;
+            const velocity = 1 + Math.random() * 2;
+            const size = 10 + Math.random() * 10;
+            
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            particle.style.left = `${centerX}px`;
+            particle.style.top = `${centerY}px`;
+            particle.style.fontSize = `${size}px`;
+            
+            // Animation
+            const animation = particle.animate([
+                { transform: 'translate(0, 0) scale(1)', opacity: 1 },
+                { transform: `translate(${Math.cos(angle) * 50 * velocity}px, ${Math.sin(angle) * 50 * velocity}px) scale(0)`, opacity: 0 }
+            ], {
+                duration: 1000 + Math.random() * 1000,
+                easing: 'cubic-bezier(0,0,0.2,1)'
+            });
+            
+            // Entferne Partikel nach Animation
+            animation.onfinish = () => particle.remove();
+        }
+    }
+});
+
+// Spiel starten
+initializeGame(); 
