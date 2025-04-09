@@ -1,0 +1,167 @@
+Erstelle ein beeindruckendes 2D Pixel-Art antikes Schachspiel als mobile App mit dem Namen "Gregor's Schach":
+
+WICHTIG: Arbeite selbstständig und frage erst wieder, wenn du komplett mit allem fertig bist. Führe alle notwendigen Schritte aus, um das Spiel vollständig zu entwickeln, ohne zwischendurch nachzufragen.
+
+Visueller Stil:
+- Künstlerischer Stil: Detaillierte Pixel-Art im Stil antiker ägyptischer Kunst mit modernen Akzenten
+- Farbschema:
+  * Hauptfarben: Tiefes Indigo, Antikes Gold, Sandstein, Türkis
+  * Akzentfarben: Ocker, Lapislazuli-Blau, Terrakotta
+  * Texturen: Pixelierte Papyrus- und Steintexturen
+  * Kontrastreiche Farbgebung für bessere Erkennbarkeit
+  * Klare Farbabgrenzungen zwischen allen Elementen
+  * Optimierte Farbpalette für mobile Displays
+  * Pixel-Perfektion für scharfe Kanten und klare Formen
+
+Spielbrett-Design:
+- 8x8 Raster mit antiken Symbolen in den Ecken
+- Jedes Feld mit einzigartigen pixelierten Hieroglyphen und antiken Mustern
+- Animierte Pixel-Partikeleffekte beim Bewegen der Figuren
+- Subtile Pixel-Sandsturm-Animation im Hintergrund
+- Goldene, pulsierende Pixel-Linien zwischen den Feldern
+- Klare, gut sichtbare Feldgrenzen
+- Ausreichend Abstand zwischen allen Elementen
+- Transparenter Hintergrund für bessere Sichtbarkeit
+- Anpassungsfähiges Layout für verschiedene Bildschirmgrößen
+- Versteckte Initialen "B", "T", "N", "G" mit Herz in den Ecken des Bretts
+- "Gregor's Schach" Logo in antiker Pixel-Schrift im Hintergrund
+
+Figuren-Design:
+- König: Majestätischer Pharao mit Nemes-Kopftuch, Krummstab und Ankh-Symbol
+  * Charakteristische blaue und goldene Pixel-Farbgebung
+  * Leuchtender Pixel-Heiligenschein
+  * Bewegliche Pixel-Stoffdetails
+  * Klare Pixel-Silhouette ohne überlappende Elemente
+  * Optimierte Pixel-Größe für mobile Displays
+  * Versteckte Initiale "N" in der Krone
+- Königin: Isis-ähnliche Figur mit Flügeln und Sonnenscheibe
+  * Elegante, fließende Pixel-Gewänder
+  * Leuchtende Pixel-Flügel mit Federmuster
+  * Charakteristische Isis-Hörner und Sonnenscheibe
+  * Flügel in separater Pixel-Ebene für bessere Sichtbarkeit
+  * Optimierte Pixel-Größe für mobile Displays
+  * Versteckte Initiale "B" in der Sonnenscheibe
+- Türme: Antike Obelisken mit Hieroglyphen
+  * Klare, vertikale Pixel-Form mit charakteristischen Spitzen
+  * Leuchtende Pixel-Hieroglyphen
+  * Sandstein-Pixel-Textur mit goldenen Akzenten
+  * Hieroglyphen in separater Pixel-Ebene
+  * Optimierte Pixel-Größe für mobile Displays
+  * Versteckte Initiale "T" in der Basis
+- Läufer: Anubis-ähnliche Figuren mit Stab
+  * Charakteristischer Pixel-Schakalkopf
+  * Leuchtende Pixel-Augen
+  * Beweglicher Pixel-Stab mit Hieroglyphen
+  * Stab in separater Pixel-Ebene für bessere Sichtbarkeit
+  * Optimierte Pixel-Größe für mobile Displays
+  * Versteckte Initiale "G" im Stab
+- Springer: Stilisierte Sphinx-Figuren
+  * Deutlich erkennbarer Pixel-Löwenkörper
+  * Charakteristischer Pixel-Pharaonenkopf
+  * Bewegliche Pixel-Flügel
+  * Flügel in separater Pixel-Ebene
+  * Optimierte Pixel-Größe für mobile Displays
+- Bauern: Antike ägyptische Diener mit Krummstab
+  * Charakteristische Pixel-Kopfbedeckung
+  * Leuchtende Pixel-Hieroglyphen auf der Kleidung
+  * Bewegliche Pixel-Stoffdetails
+  * Hieroglyphen in separater Pixel-Ebene
+  * Optimierte Pixel-Größe für mobile Displays
+
+Animationen:
+- Sanfte, aber deutliche Pixel-Bewegungsanimationen für alle Figuren
+- Spezialeffekte:
+  * Goldener Pixel-Lichtschein bei Schach
+  * Pixel-Sandsturm-Effekt bei Schachmatt
+  * Pixel-Hieroglyphen-Animation bei Figurenaufstellung
+  * Pixel-Partikeleffekte bei Figurenbewegungen
+  * Leuchtende Pixel-Auren um die Figuren
+  * Bewegliche Pixel-Stoff- und Federelemente
+- Effekte in separaten Pixel-Ebenen für bessere Sichtbarkeit
+- Optimierte Pixel-Animationen für mobile Geräte
+- Polnischer Witz: Wenn ein Bauer die letzte Reihe erreicht, verwandelt er sich in einen "Kurwa-König" mit besonderen Fähigkeiten
+
+Benutzeroberfläche:
+- Antike Pixel-Schriftart für Menüs und Texte
+- Pixel-Hieroglyphen-basierte Icons
+- Animierte Pixel-Übergänge zwischen Menüs
+- Antike Pixel-Symbole für Spieloptionen
+- Pixel-Sanduhr-Animation für Zeitkontrolle
+- Klare, gut lesbare Pixel-Beschriftungen
+- Ausreichend Abstand zwischen allen UI-Elementen
+- Transparenter Hintergrund für bessere Sichtbarkeit
+- Touch-freundliche Benutzeroberfläche
+- Anpassungsfähiges Layout für verschiedene Bildschirmgrößen
+- "Bier-Klingel"-Button mit Pixel-Bierglas-Icon und lustigem Sound
+- "Gregor's Schach" Logo in antiker Pixel-Schrift im Hauptmenü
+
+Sound-Design:
+- Authentische antike Pixel-Instrumente:
+  * Sistrum
+  * Leier
+  * Oud
+  * Antike Trommeln
+- Ambient-Sounds:
+  * Leichter Pixel-Sandwind
+  * Pixel-Wasserfontänen
+  * Pixel-Tempelglocken
+- Charakteristische Pixel-Sounds für jede Figur
+- Optimierte Pixel-Soundeffekte für mobile Geräte
+- Bier-Klingel-Sound für den speziellen Button
+- "Gregor's Schach" Jingle beim Spielstart
+
+Spielmechaniken:
+- Klassische Schachregeln
+- Zusätzlicher Spielmodus:
+  * "Verlierer-Fluch": Wer eine Figur verliert, muss einen Shot trinken
+    - Spezielle Animation und Sound beim Verlieren einer Figur
+    - Pixel-Shot-Glas erscheint auf dem Bildschirm
+    - Gregor's Geist schenkt einen Shot ein
+    - Kurwa-König tanzt einen polnischen Tanz
+    - LaFamilie-Initialen leuchten auf
+- Touch-basierte Steuerung für mobile Geräte
+- Gestensteuerung für Figurenbewegungen
+- Versteckte "LaFamilie"-Easter Eggs mit Initialen und Herz
+- Vollständig offline spielbar ohne Internetverbindung
+- Lokale Speicherung von Spielständen und Einstellungen
+
+App-Distribution:
+- Verpackung als native mobile App für iOS und Android mit dem Namen "Gregor's Schach"
+- Optimierte App-Größe für schnellen Download (unter 50MB)
+- Einfacher Installationsprozess über App Stores
+- Direkte Download-Möglichkeit über QR-Code oder Link
+- Kompatibilität mit iOS 13+ und Android 8.0+
+- Unterstützung für verschiedene Bildschirmgrößen und -auflösungen
+- Automatische Updates für neue Funktionen und Fehlerbehebungen
+- Offline-First-Ansatz: Alle Funktionen ohne Internetverbindung nutzbar
+- Lokale Datenspeicherung für Spielstände und Einstellungen
+- Minimale Berechtigungsanfragen (nur für Speicherung und Sound)
+
+Technische Spezifikationen:
+- Auflösung: 1920x1080 (Full HD)
+- Format: 2D Pixel-Art mit Parallax-Scrolling
+- Optimiert für flüssige 60 FPS
+- Responsive Design für verschiedene Bildschirmgrößen
+- HDR-Unterstützung für bessere Farbdarstellung
+- Ebenen-basierte Pixel-Rendering-Engine für klare Trennung aller Elemente
+- Transparenz-Unterstützung für bessere Sichtbarkeit
+- Optimiert für mobile Geräte (iOS und Android)
+- Unterstützung für verschiedene Bildschirmgrößen und -auflösungen
+- Touch-Steuerung für intuitive Bedienung
+- Offline-Modus für Spielen ohne Internetverbindung
+- Pixel-Perfektion für scharfe Kanten und klare Formen auf allen Displays
+- Effiziente Ressourcennutzung für lange Akkulaufzeit
+- Optimierte Speichernutzung für mobile Geräte
+- Schnelle Ladezeiten für sofortiges Spielvergnügen
+
+Entwicklungsprozess:
+- Vollständige Implementierung aller Funktionen ohne Zwischenfragen
+- Selbstständige Problemlösung bei technischen Herausforderungen
+- Kontinuierliche Qualitätssicherung während der Entwicklung
+- Vollständige Dokumentation des Codes und der Funktionen
+- Testen auf verschiedenen Geräten und Bildschirmgrößen
+- Optimierung der Performance und Benutzerfreundlichkeit
+- Erstellung einer vollständig funktionsfähigen App-Version
+- Bereitstellung der App für Download und Installation
+
+Dieses 2D Pixel-Art-Schachspiel "Gregor's Schach" vereint antike Ästhetik mit moderner Spielmechanik und schafft eine immersive, historisch authentische Atmosphäre. Jede Figur ist einzigartig und sofort erkennbar, während sie durch lebendige Pixel-Animationen und Effekte zum Leben erweckt wird. Alle Elemente sind klar voneinander getrennt und überlappen sich nicht, was eine optimale Sichtbarkeit und Spielerfahrung gewährleistet. Das Spiel ist als native mobile App für iOS und Android verfügbar, mit einer intuitiven Touch-Steuerung und anpassungsfähigem Layout für verschiedene Bildschirmgrößen. Versteckte Easter Eggs mit den Initialen "B", "T", "N", "G" und einem Herz, sowie ein polnischer Witz und ein Bier-Klingel-Button machen das Spiel zu einem einzigartigen Erlebnis. Die App funktioniert vollständig offline und kann einfach über App Stores oder direkte Download-Links installiert werden. Die Entwicklung erfolgt selbstständig und wird erst abgeschlossen, wenn alle Funktionen vollständig implementiert und getestet sind. 
